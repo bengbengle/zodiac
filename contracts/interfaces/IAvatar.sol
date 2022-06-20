@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-/// @title Zodiac Avatar - A contract that manages modules that can execute transactions via this contract.
+/// @title Zodiac Avatar - 管理可以通过该合约执行交易的模块的合约
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";

@@ -107,8 +107,8 @@ abstract contract Module is FactoryFriendly, Guardable {
                 msg.sender
             );
         }
-        (success, returnData) = IAvatar(target)
-            .execTransactionFromModuleReturnData(to, value, data, operation);
+        (success, returnData) = IAvatar(target).execTransactionFromModuleReturnData(to, value, data, operation);
+        
         if (guard != address(0)) {
             IGuard(guard).checkAfterExecution(bytes32("0x"), success);
         }
