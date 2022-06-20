@@ -8,53 +8,54 @@ import "../factory/FactoryFriendly.sol";
 import "../guard/Guardable.sol";
 
 abstract contract Module is FactoryFriendly, Guardable {
-    /// @dev Address that will ultimately execute function calls.
+    /// @dev 最终将执行函数调用的地址
     address public avatar;
-    /// @dev Address that this module will pass transactions to.
+    /// @dev 该模块将交易传递到的地址
     address public target;
 
-    /// @dev Emitted each time the avatar is set.
+    /// @dev 每次设置 Avatar 时发出
     event AvatarSet(address indexed previousAvatar, address indexed newAvatar);
-    /// @dev Emitted each time the Target is set.
+    /// @dev 每次设置目标时发出
     event TargetSet(address indexed previousTarget, address indexed newTarget);
 
-    /// @dev Sets the avatar to a new avatar (`newAvatar`).
-    /// @notice Can only be called by the current owner.
+    /// @dev 将 Avatar 设置为新 Avatar（`newAvatar`）
+    /// @notice 只能由当前所有者调用
     function setAvatar(address _avatar) public onlyOwner {
         address previousAvatar = avatar;
         avatar = _avatar;
         emit AvatarSet(previousAvatar, _avatar);
     }
 
-    /// @dev Sets the target to a new target (`newTarget`).
-    /// @notice Can only be called by the current owner.
+    /// @dev 将目标设置为新目标 (`newTarget`)
+    /// @notice 只能由当前所有者调用
     function setTarget(address _target) public onlyOwner {
         address previousTarget = target;
         target = _target;
         emit TargetSet(previousTarget, _target);
     }
 
-    /// @dev Passes a transaction to be executed by the avatar.
-    /// @notice Can only be called by this contract.
-    /// @param to Destination address of module transaction.
-    /// @param value Ether value of module transaction.
-    /// @param data Data payload of module transaction.
-    /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.
+   
+    /// @dev 传递要由 Avatar 执行的事务 
+    /// @notice 只能被这个合约调用
+    /// @param to 模块事务的目标地址 
+    /// @param value 模块交易的以太币值 
+    /// @param data 模块事务的数据负载 
+    /// @param operation 模块事务的操作类型：0 == 调用，1 == 委托调用。
     function exec(
         address to,
         uint256 value,
         bytes memory data,
         Enum.Operation operation
     ) internal returns (bool success) {
-        /// Check if a transactioon guard is enabled.
+        /// 检查是否启用了事务保护
         if (guard != address(0)) {
             IGuard(guard).checkTransaction(
-                /// Transaction info used by module transactions.
+                /// 模块事务使用的事务信息
                 to,
                 value,
                 data,
                 operation,
-                /// Zero out the redundant transaction information only used for Safe multisig transctions.
+                /// 将仅用于安全多重签名交易的冗余交易信息清零
                 0,
                 0,
                 0,
@@ -75,28 +76,28 @@ abstract contract Module is FactoryFriendly, Guardable {
         }
         return success;
     }
-
-    /// @dev Passes a transaction to be executed by the target and returns data.
-    /// @notice Can only be called by this contract.
-    /// @param to Destination address of module transaction.
-    /// @param value Ether value of module transaction.
-    /// @param data Data payload of module transaction.
-    /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.
+    
+    /// @dev 传递要由目标执行的事务并返回数据。 
+    /// @notice 只能被这个合约调用。 
+    /// @param to 模块事务的目标地址。 
+    /// @param value 模块交易的以太币值。 
+    /// @param data 模块事务的数据负载。 
+    /// @param operation 模块事务的操作类型：0 == 调用，1 == 委托调用。
     function execAndReturnData(
         address to,
         uint256 value,
         bytes memory data,
         Enum.Operation operation
     ) internal returns (bool success, bytes memory returnData) {
-        /// Check if a transactioon guard is enabled.
+        /// 检查是否启用了事务保护。
         if (guard != address(0)) {
             IGuard(guard).checkTransaction(
-                /// Transaction info used by module transactions.
+                /// 模块事务使用的事务信息
                 to,
                 value,
                 data,
                 operation,
-                /// Zero out the redundant transaction information only used for Safe multisig transctions.
+                /// 将仅用于安全多重签名交易的冗余交易信息清零
                 0,
                 0,
                 0,

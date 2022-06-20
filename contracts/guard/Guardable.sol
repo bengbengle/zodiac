@@ -5,17 +5,17 @@ import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./BaseGuard.sol";
 
-/// @title Guardable - A contract that manages fallback calls made to this contract
+/// @title Guardable - 管理对此合约的回退调用的合约
 contract Guardable is OwnableUpgradeable {
     address public guard;
 
     event ChangedGuard(address guard);
 
-    /// `guard_` does not implement IERC165.
+    /// `guard_` 没有实现 IERC165
     error NotIERC165Compliant(address guard_);
 
-    /// @dev Set a guard that checks transactions before execution.
-    /// @param _guard The address of the guard to be used or the 0 address to disable the guard.
+    /// @dev 设置一个守卫， 在执行前检查交易
+    /// @param _guard 要使用的保护的地址或禁用保护的 0 地址
     function setGuard(address _guard) external onlyOwner {
         if (_guard != address(0)) {
             if (!BaseGuard(_guard).supportsInterface(type(IGuard).interfaceId))

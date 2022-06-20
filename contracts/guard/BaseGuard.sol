@@ -17,14 +17,15 @@ abstract contract BaseGuard is IERC165 {
             interfaceId == type(IERC165).interfaceId; // 0x01ffc9a7
     }
 
-    /// @dev Module transactions only use the first four parameters: to, value, data, and operation.
-    /// Module.sol hardcodes the remaining parameters as 0 since they are not used for module transactions.
-    /// @notice This interface is used to maintain compatibilty with Gnosis Safe transaction guards.
+    /// @dev 模块事务只使用前四个参数：to、value、data 和 operation 
+    /// Module.sol 将其余参数硬编码为 0， 因为它们不用于模块事务 
+    /// @notice 此接口用于维护与 Gnosis Safe 事务保护的兼容性
     function checkTransaction(
         address to,
         uint256 value,
         bytes memory data,
         Enum.Operation operation,
+        
         uint256 safeTxGas,
         uint256 baseGas,
         uint256 gasPrice,

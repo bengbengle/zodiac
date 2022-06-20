@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-/// @title Modifier Interface - A contract that sits between a Module and an Avatar and enforce some additional logic.
+/// @title 修改器接口 - 位于模块和 Avatar 之间并强制执行一些额外逻辑的合约
 pragma solidity >=0.7.0 <0.9.0;
 
 import "../interfaces/IAvatar.sol";
@@ -14,44 +14,43 @@ abstract contract Modifier is Module, IAvatar {
     event EnabledModule(address module);
     event DisabledModule(address module);
 
-    /// `sender` is not an authorized module.
-    /// @param sender The address of the sender.
+    /// `sender` 不是授权模块
+    /// @param sender 发件人的地址
     error NotAuthorized(address sender);
 
-    /// `module` is invalid.
+    /// `module` 无效
     error InvalidModule(address module);
 
-    /// `module` is already disabled.
+    /// `module` 已经被禁用
     error AlreadyDisabledModule(address module);
 
-    /// `module` is already enabled.
+    /// `module` 已经启用
     error AlreadyEnabledModule(address module);
 
     /*
     --------------------------------------------------
-    You must override at least one of following two virtual functions,
-    execTransactionFromModule() and execTransactionFromModuleReturnData().
+    您必须至少覆盖以下两个虚拟函数之一， execTransactionFromModule() 和 execTransactionFromModuleReturnData()
     */
 
-    /// @dev Passes a transaction to the modifier.
-    /// @notice Can only be called by enabled modules.
-    /// @param to Destination address of module transaction.
-    /// @param value Ether value of module transaction.
-    /// @param data Data payload of module transaction.
-    /// @param operation Operation type of module transaction.
+   /// @notice 将事务传递给修饰符 只能由启用的模块调用 
+   /// @param to 模块事务的目标地址 
+   /// @param value 模块交易的以太币值 
+   /// @param data 模块事务的数据负载 
+   /// @param operation 模块事务的操作类型
+
     function execTransactionFromModule(
         address to,
         uint256 value,
         bytes calldata data,
         Enum.Operation operation
     ) public virtual override moduleOnly returns (bool success) {}
-
-    /// @dev Passes a transaction to the modifier, expects return data.
-    /// @notice Can only be called by enabled modules.
-    /// @param to Destination address of module transaction.
-    /// @param value Ether value of module transaction.
-    /// @param data Data payload of module transaction.
-    /// @param operation Operation type of module transaction.
+    
+    /// @dev 将事务传递给修饰符，期望返回数据 
+    /// @notice 只能由启用的模块调用 
+    /// @param to 模块事务的目标地址 
+    /// @param value 模块交易的以太币值
+    /// @param data 模块事务的数据负载 
+    /// @param operation 模块事务的操作类型
     function execTransactionFromModuleReturnData(
         address to,
         uint256 value,
@@ -73,11 +72,11 @@ abstract contract Modifier is Module, IAvatar {
         if (modules[msg.sender] == address(0)) revert NotAuthorized(msg.sender);
         _;
     }
-
-    /// @dev Disables a module on the modifier.
-    /// @notice This can only be called by the owner.
-    /// @param prevModule Module that pointed to the module to be removed in the linked list.
-    /// @param module Module to be removed.
+    
+    /// @dev 禁用修饰符上的模块
+    /// @notice 这只能由所有者调用 
+    /// @param prevModule 指向链表中要移除的模块的模块 
+    /// @param module 要删除的模块
     function disableModule(address prevModule, address module)
         public
         override
@@ -91,9 +90,9 @@ abstract contract Modifier is Module, IAvatar {
         emit DisabledModule(module);
     }
 
-    /// @dev Enables a module that can add transactions to the queue
-    /// @param module Address of the module to be enabled
-    /// @notice This can only be called by the owner
+    /// @dev 启用可以将事务添加到队列的模块 
+    /// @param module 要启用的模块的地址 
+    /// @notice 这只能由所有者调用
     function enableModule(address module) public override onlyOwner {
         if (module == address(0) || module == SENTINEL_MODULES)
             revert InvalidModule(module);
@@ -103,8 +102,8 @@ abstract contract Modifier is Module, IAvatar {
         emit EnabledModule(module);
     }
 
-    /// @dev Returns if an module is enabled
-    /// @return True if the module is enabled
+    /// @dev 如果启用了模块，则返回 
+    /// @return 如果启用了模块，则返回 True
     function isModuleEnabled(address _module)
         public
         view
@@ -114,21 +113,21 @@ abstract contract Modifier is Module, IAvatar {
         return SENTINEL_MODULES != _module && modules[_module] != address(0);
     }
 
-    /// @dev Returns array of modules.
-    /// @param start Start of the page.
-    /// @param pageSize Maximum number of modules that should be returned.
-    /// @return array Array of modules.
-    /// @return next Start of the next page.
+    /// @dev 返回模块数组 
+    /// @param start 页面的开始 
+    /// @param pageSize 应该返回的最大模块数 
+    /// @return array 模块数组 
+    /// @return next 下一页的开始
     function getModulesPaginated(address start, uint256 pageSize)
         external
         view
         override
         returns (address[] memory array, address next)
     {
-        /// Init array with max page size.
+        /// 使用有 max page size 初始化数组
         array = new address[](pageSize);
 
-        /// Populate return array.
+        /// 填充返回数组
         uint256 moduleCount = 0;
         address currentModule = modules[start];
         while (
@@ -141,7 +140,7 @@ abstract contract Modifier is Module, IAvatar {
             moduleCount++;
         }
         next = currentModule;
-        /// Set correct size of returned array.
+        /// @notice 设置返回数组的正确大小 
         // solhint-disable-next-line no-inline-assembly
         assembly {
             mstore(array, moduleCount)

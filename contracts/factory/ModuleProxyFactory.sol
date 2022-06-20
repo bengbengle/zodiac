@@ -7,13 +7,13 @@ contract ModuleProxyFactory {
         address indexed masterCopy
     );
 
-    /// `target` can not be zero.
+    /// `target` 不能为零
     error ZeroAddress(address target);
 
-    /// `address_` is already taken.
+    /// `address_` 已被占用
     error TakenAddress(address address_);
 
-    /// @notice Initialization failed.
+    /// @notice 初始化失败。
     error FailedInitialization();
 
     function createProxy(address target, bytes32 salt)
